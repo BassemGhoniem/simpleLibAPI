@@ -3,6 +3,32 @@
  */
 
 'use strict';
+
+/**
+ * @function addLinks attach api navigation links for to each book.
+ * @param req
+ * @param books
+ * @returns {Array}
+ */
+const addHyperMediaLinks = function addLinks(req, books) {
+  const returnBooks = [];
+  books.forEach((element) => {
+    const newBook = element.toJSON();
+    newBook.links = {};
+    newBook.links.self = `http://'${req.headers.host}/books/${newBook._id}`;
+    const genreLink = `http://${req.headers.host}/books/?genre=${newBook.genre}`;
+    const titleLink = `http://${req.headers.host}/books/?title=${newBook.title}`;
+    const authorLink = `http://${req.headers.host}/books/?author=${newBook.author}`;
+
+    newBook.links.searchByThisGenre = genreLink.replace(/\s/g, '%20');
+    newBook.links.searchByName = titleLink.replace(/\s/g, '%20');
+    newBook.links.searchByAuthor = authorLink.replace(/\s/g, '%20');
+    returnBooks.push(newBook);
+  });
+  return returnBooks;
+};
+
+
 const bookController = function bookController(Book) {
   return {
     /**
@@ -44,21 +70,7 @@ const bookController = function bookController(Book) {
         if (err) {
           res.status(500).send(err);
         } else {
-          const returnBooks = [];
-          books.forEach((element) => {
-            const newBook = element.toJSON();
-            newBook.links = {};
-            newBook.links.self = `http://'${req.headers.host}/books/${newBook._id}`;
-            const genreLink = `http://${req.headers.host}/books/?genre=${newBook.genre}`;
-            const titleLink = `http://${req.headers.host}/books/?title=${newBook.title}`;
-            const authorLink = `http://${req.headers.host}/books/?author=${newBook.author}`;
-
-            newBook.links.searchByThisGenre = genreLink.replace(/\s/g, '%20');
-            newBook.links.searchByName = titleLink.replace(/\s/g, '%20');
-            newBook.links.searchByAuthor = authorLink.replace(/\s/g, '%20');
-            returnBooks.push(newBook);
-          });
-          res.json(returnBooks);
+          res.json(addHyperMediaLinks(req, books));
         }
       });
     },
@@ -157,7 +169,23 @@ const bookController = function bookController(Book) {
         }
       });
     },
+
+    /**
+     * @function getRecent finds the recent five books by sorting the books by creation date.
+     * @param req
+     * @param res
+     */
+    getRecent(req, res) {
+      Book.find({}).sort({ createdAt: -1 }).limit(5).exec((err, books) => {
+        if (err) {
+          res.status(500).send(err);
+        } else {
+          res.json(addHyperMediaLinks(req, books));
+        }
+      });
+    },
   };
 };
+
 
 module.exports = bookController;

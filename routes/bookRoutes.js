@@ -13,6 +13,9 @@ const routes = function bookRoutes(Book) {
     .get(bookController.getAll)
     .delete(bookController.deleteAll);
 
+  bookRouter.route('/recent')
+    .get(bookController.getRecent);
+
   /**
    * the following middleware is used to find the book with the passed ID and attach it
    * to the request to be used with the following routes
