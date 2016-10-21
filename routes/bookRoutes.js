@@ -3,18 +3,19 @@
  */
 'use strict';
 const express = require('express');
+const Verify = require('./../verify');
 
 const routes = function bookRoutes(Book) {
   const bookRouter = express.Router();
   const bookController = require('../controllers/bookController')(Book);
 
   bookRouter.route('/')
-    .post(bookController.post)
-    .get(bookController.getAll)
-    .delete(bookController.deleteAll);
+    .post(Verify.verifyOrdinaryUser, Verify.verifyAdmin, bookController.post)
+    .get(Verify.verifyOrdinaryUser, bookController.getAll)
+    .delete(Verify.verifyOrdinaryUser, Verify.verifyAdmin, bookController.deleteAll);
 
   bookRouter.route('/recent')
-    .get(bookController.getRecent);
+    .get(Verify.verifyOrdinaryUser, Verify.verifyAdmin, bookController.getRecent);
 
   /**
    * the following middleware is used to find the book with the passed ID and attach it
@@ -33,10 +34,10 @@ const routes = function bookRoutes(Book) {
     });
   });
   bookRouter.route('/:bookId')
-    .get(bookController.getOne)
-    .put(bookController.put)
-    .patch(bookController.patch)
-    .delete(bookController.deleteOne);
+    .get(Verify.verifyOrdinaryUser, bookController.getOne)
+    .put(Verify.verifyOrdinaryUser, Verify.verifyAdmin, bookController.put)
+    .patch(Verify.verifyOrdinaryUser, Verify.verifyAdmin, bookController.patch)
+    .delete(Verify.verifyOrdinaryUser, Verify.verifyAdmin, bookController.deleteOne);
   return bookRouter;
 };
 

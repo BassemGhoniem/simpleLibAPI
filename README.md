@@ -46,9 +46,17 @@ Other than the Auth
  - Express for routing
  - Mongodb (mongoose) for handling models and database
  - gulp as task runner, will be more useful if there's tests
- - Airbnb Javascript [style guide](https://github.com/airbnb/javascript).
+ - Airbnb Javascript [style guide](https://github.com/airbnb/javascript)
  - Node v4.6.1
  
+## Adding JWT auth
+ Using `passport` and `jsonwebtoken` modules added JWT auth to the api
+ introducing two types of users Admin and ordinary.
  
+### Rules for accessing the API
+- Allow an ordinary user to only perform GET operatioins
+- Allow only an Admin to perform POST, PUT, DELETE and PATCH operations
+- Allow an Admin to be able to GET all the registered users' 
+   information from the database
  
  you can use books.json for sample test data.

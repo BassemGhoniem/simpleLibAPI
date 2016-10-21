@@ -3,15 +3,16 @@
  */
 'use strict';
 const express = require('express');
+const Verify = require('./../verify');
 
 const routes = function authorRoutes(Author) {
   const authorRouter = express.Router();
   const authorController = require('../controllers/authorController')(Author);
 
   authorRouter.route('/')
-    .post(authorController.post)
-    .get(authorController.getAll)
-    .delete(authorController.deleteAll);
+    .post(Verify.verifyOrdinaryUser, authorController.post)
+    .get(Verify.verifyOrdinaryUser, authorController.getAll)
+    .delete(Verify.verifyOrdinaryUser, authorController.deleteAll);
 
   /**
    * the following middleware is used to find the author with the passed ID and attach it
@@ -31,10 +32,10 @@ const routes = function authorRoutes(Author) {
     });
   });
   authorRouter.route('/:authorId')
-    .get(authorController.getOne)
-    .put(authorController.put)
-    .patch(authorController.patch)
-    .delete(authorController.deleteOne);
+    .get(Verify.verifyOrdinaryUser, authorController.getOne)
+    .put(Verify.verifyOrdinaryUser, authorController.put)
+    .patch(Verify.verifyOrdinaryUser, authorController.patch)
+    .delete(Verify.verifyOrdinaryUser, authorController.deleteOne);
   return authorRouter;
 };
 
